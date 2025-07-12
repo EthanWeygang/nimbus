@@ -1,4 +1,4 @@
-package com.filestorage.filestorage;
+package com.filestorage;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-@RestController
+@RestController("/api")
 public class FileController {
 
     private final S3Service s3Service;

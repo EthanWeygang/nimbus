@@ -1,4 +1,4 @@
-package com.filestorage.filestorage;
+package com.filestorage;
 
 import org.springframework.stereotype.Component;
 

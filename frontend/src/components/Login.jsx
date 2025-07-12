@@ -11,7 +11,24 @@ function Login() {
     e.preventDefault();
 
     //Add database check here using email and password vars
-
+    fetch("/api/login", 
+      {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email: email, password: password})
+    }).then(response => response.text())
+    .then(data => {
+      if(data === "Login Successful."){
+        //Redirect to home page, make token bla bla
+        window.location.href = "/files";
+      } else {
+        alert("Incorrect username or password.")
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to connect to server. Please make sure the backend is running.');
+    })
   }
   
   return (
