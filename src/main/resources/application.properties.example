@@ -1,0 +1,16 @@
+spring.application.name=filestorage
+aws.accessKey=YOUR_AWS_ACCESS_KEY
+aws.secretKey=YOUR_AWS_SECRET_KEY
+aws.region=eu-west-2
+aws.s3.bucketName=your-bucket-name
+
+# File upload configuration
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+spring.servlet.multipart.enabled=true
+
+# AWS RDC Postgres
+spring.datasource.url=jdbc:postgresql://your-db-endpoint:5432/your-database-name
+spring.datasource.username=your-username
+spring.datasource.password=your-password
+spring.jpa.hibernate.ddl-auto=update
