@@ -21,10 +21,8 @@ public class UserController {
     
     @PostMapping("/login")
     public ResponseEntity<?> logIn(@RequestBody Map<String, String> request){
-        //Map turns the Json information into key-value pairs
         String email = request.get("email");
         String password = request.get("password");
-       
 
         if(userRepository.existsByEmail(email)){
             User user = userRepository.findByEmail(email).get();

@@ -23,7 +23,7 @@ function Signup() {
         })
         .catch(error => {
           console.error('Error:', error);
-          alert('Failed to connect to server. Please make sure the backend is running.');
+          alert('Failed to connect to server.');
         })
   }
 

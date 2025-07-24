@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
   function validateLogin(e){
     // Stops page reloading
@@ -19,7 +21,7 @@ function Login() {
     .then(data => {
       if(data === "Login Successful."){
         //Redirect to home page, make token bla bla
-        window.location.href = "/files";
+        navigate("/files")
       } else {
         alert("Incorrect username or password.")
       }
