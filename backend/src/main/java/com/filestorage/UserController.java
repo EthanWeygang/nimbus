@@ -2,7 +2,6 @@ package com.filestorage;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,9 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class UserController {
 
-    @Autowired
-    UserRepository userRepository;
-    
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
+
+    public UserController(UserRepository userRepository, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.jwtService = jwtService;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> logIn(@RequestBody Map<String, String> request){
         String email = request.get("email");
@@ -28,10 +32,13 @@ public class UserController {
             User user = userRepository.findByEmail(email).get();
 
             if(user.getPassword().equals(password)){
-                return ResponseEntity.ok("Login Successful.");
+                String newToken = jwtService.generateToken(email);
+                LoginResponse response = new LoginResponse(newToken);
+
+                return ResponseEntity.ok(response);
             }
         }
-        return ResponseEntity.badRequest().body("Incorrect email or password");
+        return ResponseEntity.badRequest().body("Incorrect email or password.");
     }
 
     @PostMapping("/signup")
@@ -42,12 +49,10 @@ public class UserController {
         User newUser = new User(email, password);
 
         if(userRepository.existsByEmail(email)){
-            System.out.println("User already in use.");
             return ResponseEntity.badRequest().body("Email already in use.");
         }
 
         userRepository.save(newUser);
-        System.out.println("User added to database.");
         return ResponseEntity.ok("Sign up successful.");
     }
 }

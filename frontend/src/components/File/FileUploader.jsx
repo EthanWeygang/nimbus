@@ -22,8 +22,13 @@ function FileUploader(){
         const formData = new FormData();
         formData.append("file", file);
 
+        const token = localStorage.getItem("jwt");
+
         fetch("/api/upload", {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
             body: formData
         })
         .then(response => response.text())

@@ -1,9 +1,11 @@
 package com.filestorage;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,13 +26,23 @@ public class FileController {
         this.s3Service = s3Service;
     }
 
+    @GetMapping("/files")
+    public ResponseEntity<List<String>> getAllFiles() {
+        try {
+            List<String> files = s3Service.listFilesInBucket();
+            return ResponseEntity.ok(files);
+        } catch (Exception ex) {
+            System.out.println("Error getting files: " + ex);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PostMapping("/upload")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, String token) {
         try {
             byte[] fileBytes = file.getBytes();
 
-            s3Service.addToBucket(file.getOriginalFilename(), fileBytes); // Filename can be vunerability
-            System.out.println("Data sent successfully.");
+            s3Service.addToBucket(file.getOriginalFilename(), fileBytes, null); // THIS NULL SHOULD BE A EMAIL SO WE CAN MAKE A FOLDER
 
             return ResponseEntity.ok("File successfully uploaded.");
 

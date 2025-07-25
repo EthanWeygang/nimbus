@@ -7,29 +7,31 @@ function Login() {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-  function validateLogin(e){
+  async function validateLogin(e){
     // Stops page reloading
     e.preventDefault();
 
-    //Add database check here using email and password vars
-    fetch("/api/login", 
-      {
+    try {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({email: email, password: password})
-    }).then(response => response.text())
-    .then(data => {
-      if(data === "Login Successful."){
-        //Redirect to home page, make token bla bla
-        navigate("/files")
+      });
+
+      const data = await response.json();
+
+      if (data.token) {
+        // Success - store JWT and redirect
+        localStorage.setItem("jwt", data.token);
+        navigate("/files");
       } else {
-        alert("Incorrect username or password.")
+        // Error message from server
+        alert(data.message || "Incorrect username or password.");
       }
-    })
-    .catch(error => {
+    } catch (error) {
       console.error('Error:', error);
       alert('Failed to connect to server. Please make sure the backend is running.');
-    })
+    }
   }
   
   return (
