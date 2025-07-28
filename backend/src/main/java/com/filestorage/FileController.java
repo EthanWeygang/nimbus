@@ -1,6 +1,5 @@
 package com.filestorage;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public class FileController {
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<String>> getUsersFiles(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getUsersFiles(@RequestHeader("Authorization") String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "");
             String email = jwtService.extractUsername(token);
@@ -38,12 +37,12 @@ public class FileController {
             return ResponseEntity.ok(files);
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(e);
         }
     }
 
     @DeleteMapping("/files")
-    public ResponseEntity deleteFile(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> body){
+    public ResponseEntity<?> deleteFile(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> body){
         try {
             String fileName = body.get("fileName");
             String token = authHeader.replace("Bearer ", "");
@@ -69,9 +68,24 @@ public class FileController {
 
             return ResponseEntity.ok("File successfully uploaded.");
 
-        } catch (IOException ex) {
-            System.out.println(ex);
-            return ResponseEntity.badRequest().body("Error while uploading file.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> downloadFile(@RequestHeader String authHeader, @RequestBody Map<String, String> body){
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtService.extractUsername(token);
+            String name = body.get("fileName");
+
+            byte[] file = s3Service.downloadFile(name, email);
+
+            return ResponseEntity.ok(file);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
         }
     }
 }

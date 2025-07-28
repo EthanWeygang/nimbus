@@ -4,6 +4,28 @@ import useJwt from "../hooks/useJwt";
 function File({ filename, loadFiles }) {
   const {getToken} = useJwt();
 
+  async function downloadFile(){
+    try{
+      const response = await fetch("/api/download",
+        {
+          method: "GET",
+          headers: 
+          {
+            "Authentication" : `Bearer ${getToken()}`,
+            "Content-Type" : "application/json"
+          },
+          body: JSON.stringify({"fileName" : filename})
+        }
+      )
+
+      if(response.ok){
+        loadFiles()
+      }
+    } catch(e){
+      console.log("error: " + e)
+    }
+  }
+
 
 
   async function deleteFile(){
@@ -37,8 +59,8 @@ function File({ filename, loadFiles }) {
       backgroundColor: "#f9f9f9"
     }}>
       <h3>{filename}</h3>
-      <button>Download</button>
-      <button onClick={(e) => deleteFile(e)}>Delete</button>
+      <button onClick={downloadFile()}>Download</button>
+      <button onClick={deleteFile()}>Delete</button>
     </div>
   );
 }

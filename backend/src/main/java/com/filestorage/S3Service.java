@@ -10,6 +10,7 @@ import com.filestorage.filestorage.config.FileStorageConfig;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -44,12 +45,10 @@ public class S3Service {
     }
 
     public List<String> listFilesInFolder(String folderName) {
-        // Ensure folder name ends with "/" for proper prefix matching
-        String folderNameWithPrefix = folderName + "/";
         
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                                         .bucket(config.getBucketName())
-                                        .prefix(folderNameWithPrefix)
+                                        .prefix(folderName + "/")
                                         .build();
         
         ListObjectsV2Response response = s3Client.listObjectsV2(request);
@@ -57,8 +56,17 @@ public class S3Service {
         return response.contents()
                       .stream()
                       .map(s3Object -> s3Object.key())
-                      .filter(key -> !key.equals(folderNameWithPrefix)) // Exclude the folder itself if it exists
+                      .filter(key -> !key.equals(folderName + "/")) // Exclude the folder itself if it exists
                       .collect(Collectors.toList());
+    }
+
+    public byte[] downloadFile(String fileName, String email){
+        GetObjectRequest request = GetObjectRequest.builder()
+                                    .bucket(config.getBucketName())
+                                    .key(fileName)
+                                    .build();
+        
+        return s3Client.getObject(request); // finished here, need to return the file somehow, not sure what type to make it
     }
 
 }
