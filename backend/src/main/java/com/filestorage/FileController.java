@@ -2,13 +2,14 @@ package com.filestorage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,29 +21,51 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     private final S3Service s3Service;
+    private final JwtService jwtService;
 
 
-    FileController(S3Service s3Service) {
+    FileController(S3Service s3Service, JwtService jwtService) {
         this.s3Service = s3Service;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/files")
-    public ResponseEntity<List<String>> getAllFiles() {
+    public ResponseEntity<List<String>> getUsersFiles(@RequestHeader("Authorization") String authHeader) {
         try {
-            List<String> files = s3Service.listFilesInBucket();
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtService.extractUsername(token);
+            List<String> files = s3Service.listFilesInFolder(email);
             return ResponseEntity.ok(files);
-        } catch (Exception ex) {
-            System.out.println("Error getting files: " + ex);
+
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, String token) {
+    @DeleteMapping("/files")
+    public ResponseEntity deleteFile(@RequestHeader("Authorization") String authHeader, @RequestBody Map<String, String> body){
         try {
+            String fileName = body.get("fileName");
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtService.extractUsername(token);
+
+            s3Service.removeFromBucket(fileName, email);
+
+            return ResponseEntity.ok("File successfully deleted.");
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtService.extractUsername(token);
             byte[] fileBytes = file.getBytes();
 
-            s3Service.addToBucket(file.getOriginalFilename(), fileBytes, null); // THIS NULL SHOULD BE A EMAIL SO WE CAN MAKE A FOLDER
+            s3Service.addToBucket(file.getOriginalFilename(), fileBytes, email);
 
             return ResponseEntity.ok("File successfully uploaded.");
 
@@ -51,19 +74,4 @@ public class FileController {
             return ResponseEntity.badRequest().body("Error while uploading file.");
         }
     }
-
-    @PutMapping("/{fileName}")
-    public void addFile2(@PathVariable String fileName) {
-        byte[] dummyData = "Dummy Data".getBytes();
-
-        s3Service.addToBucket(fileName, dummyData);
-        System.out.println("Data send successfully.");
-    }
-
-    @DeleteMapping("/{fileName}")
-    public void removeFile(@PathVariable String fileName){
-        s3Service.removeFromBucket(fileName);
-        System.out.println("File deleted successfully.");
-    }
-
 }

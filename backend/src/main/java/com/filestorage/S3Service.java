@@ -28,41 +28,28 @@ public class S3Service {
     public void addToBucket(String fileName, byte[] fileData, String email){
         PutObjectRequest request = PutObjectRequest.builder()
                                 .bucket(config.getBucketName())
-                                .key(email + "/" + fileName) // ADDED THIS EMAIL PART IN PREP FOR FOLDERS
+                                .key(email + "/" + fileName)
                                 .build();
     
         s3Client.putObject(request, RequestBody.fromBytes(fileData));
     }
 
-    public void removeFromBucket(String filename){
+    public void removeFromBucket(String fileName, String email){
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                                     .bucket(config.getBucketName())
-                                    .key(filename)
+                                    .key(email + "/" + fileName)
                                     .build();
         
         s3Client.deleteObject(request);
     }
 
-    public List<String> listFilesInBucket() {
-        ListObjectsV2Request request = ListObjectsV2Request.builder()
-                                        .bucket(config.getBucketName())
-                                        .build();
-        
-        ListObjectsV2Response response = s3Client.listObjectsV2(request);
-        
-        return response.contents()
-                      .stream()
-                      .map(s3Object -> s3Object.key())
-                      .collect(Collectors.toList());
-    }
-
     public List<String> listFilesInFolder(String folderName) {
         // Ensure folder name ends with "/" for proper prefix matching
-        String prefix = folderName.endsWith("/") ? folderName : folderName + "/";
+        String folderNameWithPrefix = folderName + "/";
         
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                                         .bucket(config.getBucketName())
-                                        .prefix(prefix)
+                                        .prefix(folderNameWithPrefix)
                                         .build();
         
         ListObjectsV2Response response = s3Client.listObjectsV2(request);
@@ -70,7 +57,7 @@ public class S3Service {
         return response.contents()
                       .stream()
                       .map(s3Object -> s3Object.key())
-                      .filter(key -> !key.equals(prefix)) // Exclude the folder itself if it exists
+                      .filter(key -> !key.equals(folderNameWithPrefix)) // Exclude the folder itself if it exists
                       .collect(Collectors.toList());
     }
 

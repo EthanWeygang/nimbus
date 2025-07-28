@@ -1,9 +1,44 @@
 import { Link } from 'react-router-dom';
+import useJwt from "../hooks/useJwt";
 
-function File() {
+function File({ filename, loadFiles }) {
+  const {getToken} = useJwt();
+
+
+
+  async function deleteFile(){
+    try{
+      const response = await fetch("/api/files",
+        {
+          method: "DELETE",
+          headers: 
+          {
+            "Authorization" : `Bearer ${getToken()}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({"fileName" : filename})
+        });
+
+      if (response.ok){
+        loadFiles()
+      }
+
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+    }
+
+  }
+  
   return (
-    <div align="center" color='gray'>
-        <p>This is a card</p>
+    <div style={{
+      border: "1px solid #ccc",
+      padding: "15px",
+      borderRadius: "5px",
+      backgroundColor: "#f9f9f9"
+    }}>
+      <h3>{filename}</h3>
+      <button>Download</button>
+      <button onClick={(e) => deleteFile(e)}>Delete</button>
     </div>
   );
 }

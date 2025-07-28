@@ -1,21 +1,16 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
+import useJwt from '../hooks/useJwt';
+import File from "./File";
 
 function Files() {
   const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const { isAuthenticated, loading, deleteJwt, getToken } = useJwt();
 
-  const validateTokenAndLoadFiles = useCallback(async () => {
-    const token = localStorage.getItem("jwt");
-
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
+  const loadFiles = useCallback(async () => {
+    const token = getToken();
+    
     try {
-      // Send GET request with JWT token
       const response = await fetch("/api/files", {
         method: "GET",
         headers: {
@@ -25,35 +20,22 @@ function Files() {
       });
 
       if (response.ok) {
-        // Token is valid! Load the files and show page
         const data = await response.json();
         setFiles(data);
-        setLoading(false);
-
-      } else if (response.status === 401) {
-        // Token is invalid/expired - backend said "no way!"
-        localStorage.removeItem("jwt"); // Clear bad token
-        navigate("/login"); // Redirect to login
-
       } else {
-        // Some other error
         console.error("Error loading files:", response.status);
-        navigate("/login");
       }
-
     } catch (error) {
-      // Network error or other issue
       console.error("Network error:", error);
-      navigate("/login");
     }
+  }, [getToken]);
 
-  }, [navigate]);
-
-
-  // This runs when the component loads
   useEffect(() => {
-    validateTokenAndLoadFiles();
-  }, [validateTokenAndLoadFiles]);
+    // Only load files if authenticated
+    if (isAuthenticated && !loading) {
+      loadFiles();
+    }
+  }, [isAuthenticated, loading, loadFiles]);
 
 
   // Show loading while validating token
@@ -74,17 +56,10 @@ function Files() {
         {files.length === 0 ? (
           <p>No files uploaded yet.</p>
         ) : (
-          files.map((filename, index) => (
-            <div key={index} style={{
-              border: "1px solid #ccc", 
-              padding: "15px", 
-              borderRadius: "5px",
-              backgroundColor: "#f9f9f9"
-            }}>
-              <h3>{filename}</h3>
-              <button>Download</button>
-            </div>
-          ))
+          files.map((file) => {
+            const name = file.split("/")[1];
+            return <File key={name} filename={name} loadFiles={loadFiles}/>;
+          })
         )}
       </div>
       
@@ -94,10 +69,7 @@ function Files() {
         </Link>
         <button 
           style={{marginLeft: "10px", backgroundColor: "#ff4444", color: "white"}}
-          onClick={() => {
-            localStorage.removeItem("jwt");
-            navigate("/login");
-          }}
+          onClick={deleteJwt}
         >
           Logout
         </button>

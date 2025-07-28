@@ -4,7 +4,7 @@ import Files from "./components/Files";
 import Landing from "./components/Landing";
 import Login from "./components/Login";
 import Signup from './components/Signup';
-import Upload from './components/File/Upload';
+import Upload from './components/Upload';
 
 function App() {
   return (
