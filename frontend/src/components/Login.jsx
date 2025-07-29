@@ -35,14 +35,14 @@ function Login() {
   }
   
   return (
-    <div align="center">
-        <h1>Log in</h1>
-        <form onSubmit={(e) => validateLogin(e)}>
-        <input placeholder='Email' onChange={(e)  => setEmail(e.target.value)}></input> <br/>
-        <input type="password" placeholder='Password' onChange={(e)  => setPassword(e.target.value)}></input> <br/>
-        <input type="submit" value="Log in"></input>
-        </form>
-        <p>or <Link to="/signup">Sign up</Link> instead</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6">Log in</h1>
+      <form onSubmit={validateLogin} className="flex flex-col gap-4 w-72">
+        <input className="border rounded px-3 py-2" placeholder="Email" onChange={e => setEmail(e.target.value)} />
+        <input className="border rounded px-3 py-2" type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+        <input className="bg-blue-600 text-white rounded px-3 py-2 cursor-pointer hover:bg-blue-700 transition" type="submit" value="Log in" />
+      </form>
+      <p className="mt-4">or <Link to="/signup" className="text-blue-600 hover:underline">Sign up</Link> instead</p>
     </div>
   );
 }

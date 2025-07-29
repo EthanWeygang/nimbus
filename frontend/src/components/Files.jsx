@@ -41,20 +41,19 @@ function Files() {
   // Show loading while validating token
   if (loading) {
     return (
-      <div align="center">
-        <h2>Loading...</h2>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <h2 className="text-2xl font-semibold">Loading...</h2>
       </div>
     );
   }
   
 
   return (
-    <div align="center">
-      <h1>Your Files</h1>
-      
-      <div style={{display: "flex", flexDirection: "column", gap: "10px", width: "80%"}}>
+    <div className="flex flex-col items-center min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6 mt-8">Your Files</h1>
+      <div className="flex flex-row flex-wrap justify-center items-start w-full max-w-6xl">
         {files.length === 0 ? (
-          <p>No files uploaded yet.</p>
+          <p className="text-gray-500">No files uploaded yet.</p>
         ) : (
           files.map((file) => {
             const name = file.split("/")[1];
@@ -63,12 +62,12 @@ function Files() {
         )}
       </div>
       
-      <div style={{marginTop: "20px"}}>
+      <div className="mt-6 flex gap-4">
         <Link to="/files/upload">
-          <button>Upload New File</button>
+          <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Upload New File</button>
         </Link>
         <button 
-          style={{marginLeft: "10px", backgroundColor: "#ff4444", color: "white"}}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
           onClick={deleteJwt}
         >
           Logout

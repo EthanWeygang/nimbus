@@ -25,20 +25,27 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> logIn(@RequestBody Map<String, String> request){
-        String email = request.get("email");
-        String password = request.get("password");
+        try {
+            
+        
+        
+            String email = request.get("email");
+            String password = request.get("password");
 
-        if(userRepository.existsByEmail(email)){
-            User user = userRepository.findByEmail(email).get();
+            if(userRepository.existsByEmail(email)){
+                User user = userRepository.findByEmail(email).get();
 
-            if(user.getPassword().equals(password)){
-                String newToken = jwtService.generateToken(email);
-                LoginResponse response = new LoginResponse(newToken);
+                if(user.getPassword().equals(password)){
+                    String newToken = jwtService.generateToken(email);
+                    LoginResponse response = new LoginResponse(newToken);
 
-                return ResponseEntity.ok(response);
+                    return ResponseEntity.ok(response);
+                }
             }
+            return ResponseEntity.badRequest().body("Incorrect email or password.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
         }
-        return ResponseEntity.badRequest().body("Incorrect email or password.");
     }
 
     @PostMapping("/signup")

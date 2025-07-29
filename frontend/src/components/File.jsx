@@ -61,15 +61,12 @@ function File({ filename, loadFiles }) {
   }
   
   return (
-    <div style={{
-      border: "1px solid #ccc",
-      padding: "15px",
-      borderRadius: "5px",
-      backgroundColor: "#f9f9f9"
-    }}>
-      <h3>{filename}</h3>
-        <button onClick={downloadFile}>Download</button>
-        <button onClick={deleteFile}>Delete</button>
+    <div className="border border-gray-300 p-4 rounded-lg bg-white shadow-md flex flex-col items-center w-64 h-40 box-border mx-2 my-2">
+      <h3 className="font-semibold text-lg break-all mb-4">{filename}</h3>
+      <div className="flex gap-2 mt-auto">
+        <button onClick={downloadFile} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Download</button>
+        <button onClick={deleteFile} className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">Delete</button>
+      </div>
     </div>
   );
 }

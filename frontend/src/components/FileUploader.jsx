@@ -48,30 +48,24 @@ function FileUploader(){
         });
     }
 
-    return(
-    <>
-    <div>
-        <form onSubmit={(e) => {handleFileUpload(e)}}>
-        <input type="file" onChange={(e) => handleFileChange(e)}></input>
-        {status === "loaded" && file &&
-            <div>
-            <p>File name: {file.name}</p>
-            <p>Size: {(file.size/1024).toFixed(2)} KB</p>
-            <p>Type: {file.type}</p>
+    return (
+      <div className="w-full max-w-md mx-auto">
+        <form onSubmit={handleFileUpload} className="flex flex-col gap-4">
+          <input type="file" onChange={handleFileChange} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+          {status === "loaded" && file && (
+            <div className="bg-gray-100 rounded p-2">
+              <p>File name: {file.name}</p>
+              <p>Size: {(file.size/1024).toFixed(2)} KB</p>
+              <p>Type: {file.type}</p>
             </div>
-        }
-        {file && status !== "uploading" &&
-        <div>
-            <br/>
-            <button type="submit">Upload</button>
-        </div>
-            }
+          )}
+          {file && status !== "uploading" && (
+            <button type="submit" className="bg-blue-600 text-white rounded px-3 py-2 hover:bg-blue-700 transition mt-2">Upload</button>
+          )}
         </form>
-
-        {status === "success" && <p>File successfully uploaded!</p>}
-        {status === "error" && <p>Error, file not uploaded.</p>}
-    </div>
-    </>
-)
+        {status === "success" && <p className="text-green-600 mt-2">File successfully uploaded!</p>}
+        {status === "error" && <p className="text-red-600 mt-2">Error, file not uploaded.</p>}
+      </div>
+    );
 }
 export default FileUploader;
