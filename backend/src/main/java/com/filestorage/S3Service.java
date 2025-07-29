@@ -3,10 +3,12 @@ package com.filestorage;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
 
-import com.filestorage.filestorage.config.FileStorageConfig;
+import com.filestorage.config.FileStorageConfig;
 
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -44,11 +46,10 @@ public class S3Service {
         s3Client.deleteObject(request);
     }
 
-    public List<String> listFilesInFolder(String folderName) {
-        
+    public List<String> listFilesInFolder(String email) {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                                         .bucket(config.getBucketName())
-                                        .prefix(folderName + "/")
+                                        .prefix(email + "/")
                                         .build();
         
         ListObjectsV2Response response = s3Client.listObjectsV2(request);
@@ -56,17 +57,26 @@ public class S3Service {
         return response.contents()
                       .stream()
                       .map(s3Object -> s3Object.key())
-                      .filter(key -> !key.equals(folderName + "/")) // Exclude the folder itself if it exists
+                      .filter(key -> !key.equals(email + "/")) // Exclude the folder itself if it exists
                       .collect(Collectors.toList());
     }
 
-    public byte[] downloadFile(String fileName, String email){
+    public InputStreamResource downloadFile(String fileName, String email){
         GetObjectRequest request = GetObjectRequest.builder()
                                     .bucket(config.getBucketName())
-                                    .key(fileName)
+                                    .key(email + "/" + fileName)
                                     .build();
         
-        return s3Client.getObject(request); // finished here, need to return the file somehow, not sure what type to make it
+        ResponseInputStream object = s3Client.getObject(request);
+        
+        // Input Stream resource is the type used for binary streams that Spring uses
+        return new InputStreamResource(object);
+    }
+
+    public int countFiles(String email){
+        int fileAmount = listFilesInFolder(email).size();
+
+        return fileAmount;
     }
 
 }

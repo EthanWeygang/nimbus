@@ -36,6 +36,7 @@ function FileUploader(){
             if(data === "File successfully uploaded."){
                 setStatus("success");
             } else {
+                alert(data)
                 setStatus("error");
             }
             

@@ -6,20 +6,29 @@ function File({ filename, loadFiles }) {
 
   async function downloadFile(){
     try{
-      const response = await fetch("/api/download",
+      const response = await fetch(`/api/download?fileName=${encodeURIComponent(filename)}`,
         {
           method: "GET",
           headers: 
           {
-            "Authentication" : `Bearer ${getToken()}`,
+            "Authorization" : `Bearer ${getToken()}`,
             "Content-Type" : "application/json"
-          },
-          body: JSON.stringify({"fileName" : filename})
+          }
         }
       )
 
       if(response.ok){
-        loadFiles()
+
+        const blob = await response.blob()
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename; // or whatever filename you want
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
       }
     } catch(e){
       console.log("error: " + e)
@@ -59,8 +68,8 @@ function File({ filename, loadFiles }) {
       backgroundColor: "#f9f9f9"
     }}>
       <h3>{filename}</h3>
-      <button onClick={downloadFile()}>Download</button>
-      <button onClick={deleteFile()}>Delete</button>
+        <button onClick={downloadFile}>Download</button>
+        <button onClick={deleteFile}>Delete</button>
     </div>
   );
 }

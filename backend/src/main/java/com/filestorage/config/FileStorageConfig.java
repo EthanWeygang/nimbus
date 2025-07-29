@@ -1,4 +1,4 @@
-package com.filestorage.filestorage.config;
+package com.filestorage.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
