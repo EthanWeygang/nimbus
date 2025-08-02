@@ -1,12 +1,15 @@
-package com.filestorage;
+package com.filestorage.controller;
 
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,10 +20,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.filestorage.service.JwtService;
+import com.filestorage.service.S3Service;
+
 @RestController
+@CrossOrigin
 @RequestMapping("/api")
 public class FileController {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
     private final S3Service s3Service;
     private final JwtService jwtService;
 
@@ -31,14 +39,28 @@ public class FileController {
 
 
     @GetMapping("/files")
-    public ResponseEntity<?> getUsersFiles(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getUsersFiles(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        logger.info("=== FILES ENDPOINT HIT ===");
+        logger.info("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
+        
         try {
-            String token = authHeader.replace("Bearer ", "");
-            String email = jwtService.extractUsername(token);
+            String email = "ethanweygang@gmail.com"; // Default for testing
+            if (authHeader != null) {
+                try {
+                    String token = authHeader.replace("Bearer ", "");
+                    email = jwtService.extractUsername(token);
+                    logger.info("Extracted email from token: " + email);
+                } catch (Exception e) {
+                    logger.warn("Failed to extract email from token, using default: " + e.getMessage());
+                }
+            }
+            
+            logger.info("Fetching files for user: " + email);
             List<String> files = s3Service.listFilesInFolder(email);
             return ResponseEntity.ok(files);
 
         } catch (Exception e) {
+            logger.error("Files endpoint error: " + e.getMessage());
             return ResponseEntity.badRequest().body(e);
         }
     }
@@ -59,11 +81,50 @@ public class FileController {
         }
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> addFile(@RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String authHeader) {
+    @GetMapping("/test")
+    public ResponseEntity<?> testEndpoint() {
+        logger.info("=== TEST ENDPOINT HIT ===");
+        return ResponseEntity.ok("Test endpoint working!");
+    }
+
+    @GetMapping("/test-s3")
+    public ResponseEntity<?> testS3Connection() {
         try {
-            String token = authHeader.replace("Bearer ", "");
-            String email = jwtService.extractUsername(token);
+            logger.info("=== TESTING S3 CONNECTION ===");
+            List<String> files = s3Service.listFilesInFolder("test");
+            return ResponseEntity.ok("S3 connection working! Found " + files.size() + " files.");
+        } catch (Exception e) {
+            logger.error("S3 test failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("S3 connection failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> addFile(@RequestParam(value = "file", required = false) MultipartFile file, 
+                                   @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        logger.info("=== UPLOAD ENDPOINT HIT ===");
+        logger.info("File: " + (file != null ? file.getOriginalFilename() : "NULL"));
+        logger.info("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
+        
+        if (file == null) {
+            logger.warn("No file provided in upload request");
+            return ResponseEntity.badRequest().body("No file provided");
+        }
+        
+        // For debugging - let's temporarily use a hardcoded email
+        String email = "test-user@example.com";
+        if (authHeader != null) {
+            try {
+                String token = authHeader.replace("Bearer ", "");
+                email = jwtService.extractUsername(token);
+                logger.info("Extracted email from token: " + email);
+            } catch (Exception e) {
+                logger.warn("Failed to extract email from token, using default: " + e.getMessage());
+            }
+        }
+        
+        try {
             byte[] fileBytes = file.getBytes();
             List<String> currentFiles = s3Service.listFilesInFolder(email);
 
@@ -75,12 +136,16 @@ public class FileController {
                 return ResponseEntity.badRequest().body("A file with this name already exists.");
             }
 
+            logger.info("Uploading file to S3: " + file.getOriginalFilename() + " for user: " + email);
             s3Service.addToBucket(file.getOriginalFilename(), fileBytes, email);
+            logger.info("Upload to S3 completed for: " + file.getOriginalFilename());
 
             return ResponseEntity.ok("File successfully uploaded.");
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            logger.error("File upload failed: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("File upload failed: " + e.getMessage());
         }
     }
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
+    Optional<User> findByVerificationCode(String verificationCode);
     boolean existsByEmail(String email);
     void deleteByEmail(String email);
     long countByEmail(String email);

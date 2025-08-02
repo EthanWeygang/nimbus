@@ -6,12 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
+import lombok.Getter;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
+@Getter
 public class FileStorageConfig {
 
     // @Value grabs values from application.properties and injects the value into the below variable
@@ -45,13 +47,5 @@ public class FileStorageConfig {
     public MultipartResolver multipartResolver() {
         StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
         return resolver;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public String getRegion() {
-        return region;
     }
 }

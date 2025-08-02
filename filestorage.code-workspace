@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "name": "filestorage-root",
+            "path": "."
+        },
+        {
+            "name": "backend",
+            "path": "./backend"
+        },
+        {
+            "name": "frontend", 
+            "path": "./frontend"
+        }
+    ],
+    "settings": {
+        "java.compile.nullAnalysis.mode": "automatic",
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "java.import.maven.enabled": true,
+        "java.maven.downloadSources": true
+    }
+}
