@@ -8,10 +8,11 @@ function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        document.title = "Login - FileStorage";
-    }, []);
-
+  useEffect(() => {
+    if (localStorage.getItem("jwt")){
+      navigate("/files")
+    }
+  }, [navigate])
 
   async function validateLogin(e){
     // Stops page reloading

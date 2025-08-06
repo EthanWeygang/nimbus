@@ -21,7 +21,7 @@ function FileUploader(){
           setStatus("error");
           return false;
         }
-        
+
         return true;
     }
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
@@ -9,8 +9,11 @@ function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-
-  
+  useEffect(() => {
+    if (localStorage.getItem("jwt")){
+      navigate("/files")
+    }
+  }, [navigate])
 
   async function signIn(e){
     e.preventDefault();

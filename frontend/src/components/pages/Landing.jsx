@@ -1,8 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import FilterIcon from "../svg/FilterIcon"
 import PadlockIcon from '../svg/PadlockIcon';
 
 function Landing() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("jwt")){
+      navigate("/files")
+    }
+  }, [navigate])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-mint">
@@ -41,7 +49,7 @@ function Landing() {
                 <PadlockIcon/>
               </div>
               <h3 className="text-lg font-semibold text-charcoal mb-2">Secure Storage</h3>
-              <p className="text-darkSage">End-to-end encryption ensures your files are always protected.</p>
+              <p className="text-darkSage">Encryption ensures your files are store and protected.</p>
             </div>
             
             <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
@@ -58,8 +66,8 @@ function Landing() {
               <div className="w-12 h-12 bg-darkSage rounded-lg mb-4 mx-auto flex items-center justify-center">
                 <FilterIcon/>
               </div>
-              <h3 className="text-lg font-semibold text-charcoal mb-2">Smart Organization</h3>
-              <p className="text-darkSage">Organize and find your files with intelligent search.</p>
+              <h3 className="text-lg font-semibold text-charcoal mb-2">Simple Organization</h3>
+              <p className="text-darkSage">All your files locallised into one place.</p>
             </div>
           </div>
         </div>
