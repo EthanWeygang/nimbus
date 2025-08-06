@@ -1,4 +1,4 @@
-# CloudItty - File Storage Application
+# CloudItty - a Cloud File Storage Application
 
 Do you need a small, free cloud storage site to store your files? Probably not. Google drive is free. But here it is anyways!
 
