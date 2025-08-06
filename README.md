@@ -7,7 +7,7 @@ Do you need a small, free cloud storage site to store your files? Probably not. 
 ## 🚀 Features
 
 - **File Upload, Download, Deletion and Storage**: Upload files with drag-and-drop or click-to-browse functionality
-- **React - Tailwind website**
+- **React - Tailwind website**: A responsive and modern front end
 - **JWT User Authentication**: JWT-based authentication system
 - **Cloud Deployment**: Deployed with AWS Elastic Beanstalk, S3, CloudFront, and Route 53
 
