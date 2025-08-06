@@ -5,11 +5,34 @@ function FileUploader(){
     const [status, setStatus] = useState("idle");
     const [dragActive, setDragActive] = useState(false);
 
+    function validateFile(selectedFile) {
+        const maxSize = 1024 * 1024;
+        const allowedExtensions = ['.txt', '.png', '.jpg', '.wmv', '.mp4', '.mp3'];
+        const fileExtension = selectedFile.name.toLowerCase().substring(selectedFile.name.lastIndexOf('.'));
+
+        if(selectedFile.size > maxSize){
+          alert(`File size is ${formatFileSize(selectedFile.size)}. File must be less than 1MB.`)
+          setStatus("error")
+          return false
+        }
+        
+        if (!allowedExtensions.includes(fileExtension)) { 
+          alert(`Unsupported filetype.`);
+          setStatus("error");
+          return false;
+        }
+        
+        return true;
+    }
+
     function handleFileChange(e){
         if (e.target.files){
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            if (validateFile(selectedFile)) {
+                setFile(selectedFile);
+                setStatus("loaded");
+            }
         }
-        setStatus("loaded")
     }
 
     function handleDrag(e) {
@@ -27,8 +50,11 @@ function FileUploader(){
         e.stopPropagation();
         setDragActive(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setFile(e.dataTransfer.files[0]);
-            setStatus("loaded");
+            const selectedFile = e.dataTransfer.files[0];
+            if (validateFile(selectedFile)) {
+                setFile(selectedFile);
+                setStatus("loaded");
+            }
         }
     }
 
@@ -66,7 +92,6 @@ function FileUploader(){
             console.log("Response data:", result.text);
             console.log("Status code:", result.status);
             
-            // If we get a 200 status, consider it successful even if response text is empty
             if(result.ok && (result.text === "File successfully uploaded." || result.text === "")) {
                 setStatus("success");
                 setTimeout(() => {
