@@ -18,12 +18,12 @@ Do you need a small, free cloud storage site to store your files? Probably not. 
 
 ## 🏗️ Architecture
 
-### Frontend
+### 🌐 Frontend
 - **React Router**
 - **Tailwind CSS**
 - **JWT Authentication**
 
-### Backend
+### 🛠️ Backend
 - **Spring Boot** - API request handling
 - **Spring Security** - Authentication and authorization
 - **PostgreSQL** - User database
