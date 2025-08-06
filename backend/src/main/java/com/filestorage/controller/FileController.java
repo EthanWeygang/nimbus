@@ -3,8 +3,6 @@ package com.filestorage.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,7 +26,6 @@ import com.filestorage.service.S3Service;
 @RequestMapping("/api")
 public class FileController {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileController.class);
     private final S3Service s3Service;
     private final JwtService jwtService;
 
@@ -40,27 +37,26 @@ public class FileController {
 
     @GetMapping("/files")
     public ResponseEntity<?> getUsersFiles(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        logger.info("=== FILES ENDPOINT HIT ===");
-        logger.info("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
+        // System.out.println("=== FILES ENDPOINT HIT ===");
+        // System.out.println("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
+
+        if(authHeader == null){
+            return ResponseEntity.badRequest().body(Map.of("error", "No authorization header present."));
+        }
         
         try {
-            String email = "ethanweygang@gmail.com"; // Default for testing
-            if (authHeader != null) {
-                try {
-                    String token = authHeader.replace("Bearer ", "");
-                    email = jwtService.extractUsername(token);
-                    logger.info("Extracted email from token: " + email);
-                } catch (Exception e) {
-                    logger.warn("Failed to extract email from token, using default: " + e.getMessage());
-                }
-            }
+
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtService.extractUsername(token);
+            // System.out.println("Extracted email from token: " + email);
+
             
-            logger.info("Fetching files for user: " + email);
+            // System.out.println("Fetching files for user: " + email);
             List<String> files = s3Service.listFilesInFolder(email);
             return ResponseEntity.ok(files);
 
         } catch (Exception e) {
-            logger.error("Files endpoint error: " + e.getMessage());
+            // System.out.println("Files endpoint error: " + e.getMessage());
             return ResponseEntity.badRequest().body(e);
         }
     }
@@ -83,18 +79,18 @@ public class FileController {
 
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {
-        logger.info("=== TEST ENDPOINT HIT ===");
+        // System.out.println("=== TEST ENDPOINT HIT ===");
         return ResponseEntity.ok("Test endpoint working!");
     }
 
     @GetMapping("/test-s3")
     public ResponseEntity<?> testS3Connection() {
         try {
-            logger.info("=== TESTING S3 CONNECTION ===");
+            // System.out.println("=== TESTING S3 CONNECTION ===");
             List<String> files = s3Service.listFilesInFolder("test");
             return ResponseEntity.ok("S3 connection working! Found " + files.size() + " files.");
         } catch (Exception e) {
-            logger.error("S3 test failed: " + e.getMessage());
+            // System.out.println("S3 test failed: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("S3 connection failed: " + e.getMessage());
         }
@@ -103,12 +99,12 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<?> addFile(@RequestParam(value = "file", required = false) MultipartFile file, 
                                    @RequestHeader(value = "Authorization", required = false) String authHeader) {
-        logger.info("=== UPLOAD ENDPOINT HIT ===");
-        logger.info("File: " + (file != null ? file.getOriginalFilename() : "NULL"));
-        logger.info("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
+        // System.out.println("=== UPLOAD ENDPOINT HIT ===");
+        // System.out.println("File: " + (file != null ? file.getOriginalFilename() : "NULL"));
+        // System.out.println("Auth header: " + (authHeader != null ? "PROVIDED" : "NULL"));
         
         if (file == null) {
-            logger.warn("No file provided in upload request");
+            System.err.println("No file provided in upload request");
             return ResponseEntity.badRequest().body("No file provided");
         }
         
@@ -118,9 +114,9 @@ public class FileController {
             try {
                 String token = authHeader.replace("Bearer ", "");
                 email = jwtService.extractUsername(token);
-                logger.info("Extracted email from token: " + email);
+                // System.out.println("Extracted email from token: " + email);
             } catch (Exception e) {
-                logger.warn("Failed to extract email from token, using default: " + e.getMessage());
+                System.err.println("Failed to extract email from token, using default: " + e.getMessage());
             }
         }
         
@@ -136,14 +132,14 @@ public class FileController {
                 return ResponseEntity.badRequest().body("A file with this name already exists.");
             }
 
-            logger.info("Uploading file to S3: " + file.getOriginalFilename() + " for user: " + email);
+            // System.out.println("Uploading file to S3: " + file.getOriginalFilename() + " for user: " + email);
             s3Service.addToBucket(file.getOriginalFilename(), fileBytes, email);
-            logger.info("Upload to S3 completed for: " + file.getOriginalFilename());
+            // System.out.println("Upload to S3 completed for: " + file.getOriginalFilename());
 
             return ResponseEntity.ok("File successfully uploaded.");
 
         } catch (Exception e) {
-            logger.error("File upload failed: " + e.getMessage());
+            System.err.println("File upload failed: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("File upload failed: " + e.getMessage());
         }

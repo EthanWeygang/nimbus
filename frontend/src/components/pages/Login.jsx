@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -8,6 +8,10 @@ function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        document.title = "Login - FileStorage";
+    }, []);
+
 
   async function validateLogin(e){
     // Stops page reloading
@@ -15,29 +19,28 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // const response = await fetch(`https://dcg0tgtvg8elj.cloudfront.net/api/login?cb=${Date.now()}`, { // CloudFront endpoint
-      const apiUrl = `${process.env.REACT_APP_API_URL}/api/login`;
-      console.log("Attempting to fetch from:", apiUrl); // Debug log
-      const response = await fetch(apiUrl, { // Use environment variable
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({email: email, password: password})
       });
 
       const data = await response.json();
-      console.log(data)
 
       if (response.ok && data.token) {
         // Success - store JWT and redirect
         localStorage.setItem("jwt", data.token);
         navigate("/files");
+
       } else {
-        // Error message from server
-        alert(data.message || data.error || "Login failed");
+        console.log(data.error)
+        alert(data.error || "Unknown error occured");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Network error: " + error.message);
+
+    } catch (e) {
+      console.error(e);
+      alert("Network error: " + e.message);
     } finally {
       setIsLoading(false);
     }

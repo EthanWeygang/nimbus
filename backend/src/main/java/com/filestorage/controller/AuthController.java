@@ -13,6 +13,7 @@ public class AuthController {
     // This is simply here for  the front end to request when they just want to use the Jwt filter to auth a token without affecting perfomance
     @GetMapping("/auth")
     public ResponseEntity authorise(){
+        System.out.println("== AuthController HIT ==");
         return ResponseEntity.ok("");
     }
 }

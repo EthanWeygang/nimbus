@@ -12,9 +12,7 @@
       setLoading(true)
       
       try{
-         console.log("Sending verification request to:", `${process.env.REACT_APP_API_URL}/api/verify`);
-         console.log("Verification code:", verificationCode);
-         
+      
          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/verify`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -24,15 +22,12 @@
          console.log("Response status:", response.status);
          console.log("Response ok:", response.ok);
 
-         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-         }
-
          const data = await response.json();
          console.log("Response data:", data);
 
          if(data.error){
-            alert(data.error)
+            console.log(data.error)
+            alert("Error: " + data.error)
             setLoading(false)
             return
          }

@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
 
   
 
-  function signIn(e){
+  async function signIn(e){
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -25,26 +27,31 @@ function Signup() {
     
     setIsLoading(true);
 
-    fetch(`${process.env.REACT_APP_API_URL}/api/signup`,{
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({email, password})
-        }).then(response => response.text())
-        .then(data => {
-          if (data === "Sign up successful."){
-            console.log(data)
-            window.location.href = "/verify" // change this
-          } else {
-            alert('Email already in use.')
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to connect to server.');
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+    try{
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/signup`,{
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email: email, password: password})
+          });
+          
+          const data = await response.json();
+          console.log(data)
+
+            console.log(data.response)
+            if (response.ok && data.response === "Signup successful."){
+              navigate("/verify")
+
+            } else {
+              console.log(data.error)
+              alert(data.error || "Unknown error occured.")
+            }
+
+        } catch(e){
+          console.log(e)
+        } finally {
+          setIsLoading(false)
+        }
   }
 
   

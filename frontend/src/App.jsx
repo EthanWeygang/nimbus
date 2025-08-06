@@ -1,5 +1,6 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Files from "./components/pages/Files";
 import Landing from "./components/pages/Landing";
 import Login from "./components/pages/Login";
@@ -9,6 +10,10 @@ import Navigation from './components/elements/Navigation';
 import Verify from './components/pages/Verify';
 
 function App() {
+  useEffect(() => {
+    document.title = "CloudItty";
+  }, []);
+
   return (
 <>
 <Router>

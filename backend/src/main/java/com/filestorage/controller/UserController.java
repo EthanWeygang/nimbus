@@ -44,45 +44,45 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS}) // AI
     public ResponseEntity<?> logIn(@RequestBody Map<String, String> request, HttpServletRequest httpRequest){
         try {
             // Log request details for debugging
-            System.out.println("=== LOGIN REQUEST DEBUG ===");
-            System.out.println("Request URI: " + httpRequest.getRequestURI());
-            System.out.println("Request Method: " + httpRequest.getMethod());
-            System.out.println("Remote Address: " + httpRequest.getRemoteAddr());
-            System.out.println("X-Forwarded-For: " + httpRequest.getHeader("X-Forwarded-For"));
-            System.out.println("X-Real-IP: " + httpRequest.getHeader("X-Real-IP"));
-            System.out.println("Host: " + httpRequest.getHeader("Host"));
-            System.out.println("User-Agent: " + httpRequest.getHeader("User-Agent"));
+            // System.out.println("=== LOGIN REQUEST DEBUG ===");
+            // System.out.println("Request URI: " + httpRequest.getRequestURI());
+            // System.out.println("Request Method: " + httpRequest.getMethod());
+            // System.out.println("Remote Address: " + httpRequest.getRemoteAddr());
+            // System.out.println("X-Forwarded-For: " + httpRequest.getHeader("X-Forwarded-For"));
+            // System.out.println("X-Real-IP: " + httpRequest.getHeader("X-Real-IP"));
+            // System.out.println("Host: " + httpRequest.getHeader("Host"));
+            // System.out.println("User-Agent: " + httpRequest.getHeader("User-Agent"));
         
             String email = request.get("email");
             String password = request.get("password");
             
-            System.out.println("Login attempt for email: " + email);
+            // System.out.println("Login attempt for email: " + email);
 
             if(userRepository.existsByEmail(email)){
                 User user = userRepository.findByEmail(email).get();
                 
-                System.out.println("User found: " + user.getEmail());
-                System.out.println("User enabled: " + user.isEnabled());
+                // System.out.println("User found: " + user.getEmail());
+                // System.out.println("User enabled: " + user.isEnabled());
                 
                 boolean matches = passwordEncoder.matches(password, user.getPassword());
-                System.out.println("Password matches: " + matches);
+                // System.out.println("Password matches: " + matches);
 
                 if(matches && user.isEnabled()){ 
-                    System.out.println("Login successful - generating token");
+                    // System.out.println("Login successful - generating token");
                     String newToken = jwtService.generateToken(email);
-                    System.out.println("Token generated successfully");
+                    // System.out.println("Token generated successfully");
                     return ResponseEntity.ok(Map.of("token", newToken));
                 } else {
-                    System.out.println("Login failed - Password match: " + matches + ", User enabled: " + user.isEnabled());
+                    System.err.println("Login failed - Password match: " + matches + ", User enabled: " + user.isEnabled());
                 }
             } else {
-                System.out.println("User not found with email: " + email);
+                System.err.println("User not found with email: " + email);
             }
             return ResponseEntity.badRequest().body(Map.of("error", "Incorrect email or password."));
+
         } catch (Exception e) {
             System.err.println("Login error: " + e.getMessage());
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class UserController {
             String password = request.get("password");
             
             if(userRepository.existsByEmail(email)){
-                return ResponseEntity.badRequest().body("Email already in use.");
+                return ResponseEntity.badRequest().body(Map.of("error", "Email already in use."));
             }
             
             // Create RegisterUserDto for the authentication service
@@ -105,17 +105,13 @@ public class UserController {
             registerDto.setEmail(email);
             registerDto.setPassword(password);
             
-            // Use AuthenticationService which handles:
-            // - Password encoding
-            // - Verification code generation
-            // - Email sending
-            // - Setting user as disabled until verified
             authenticationService.signup(registerDto);
             
-            return ResponseEntity.ok("Sign up successful.");
+            return ResponseEntity.ok(Map.of("response", "Signup successful."));
+
         } catch (Exception e) {
             System.err.println("Signup error: " + e.getMessage());
-            return ResponseEntity.badRequest().body("Signup failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", "Signup failed: " + e.getMessage()));
         }
     }
 
@@ -138,19 +134,22 @@ public class UserController {
             authenticationService.verifyUser(verifyDto);
             
             return ResponseEntity.ok(Map.of("response", "Account verified successfully. You can now log in."));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Verification failed: " + e.getMessage()));
         }
     }
 
+    // Not implemented yet
     @PostMapping("/resend-verification")
     public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> request){
         try {
             String email = request.get("email");
             authenticationService.resendVerificationCode(email);
-            return ResponseEntity.ok("Verification code resent. Please check your email.");
+            return ResponseEntity.ok(Map.of("response", "Verification code resent. Please check your email."));
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to resend verification: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", "Verification Resend Failed: " + e.getMessage()));
         }
     }
 }
