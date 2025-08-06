@@ -67,7 +67,7 @@ function Landing() {
                 <FilterIcon/>
               </div>
               <h3 className="text-lg font-semibold text-charcoal mb-2">Simple Organization</h3>
-              <p className="text-darkSage">All your files locallised into one place.</p>
+              <p className="text-darkSage">All your files localised into one place.</p>
             </div>
           </div>
         </div>

@@ -11,7 +11,7 @@ import Verify from './components/pages/Verify';
 
 function App() {
   useEffect(() => {
-    document.title = "CloudItty";
+    document.title = "Nimbus";
   }, []);
 
   return (
