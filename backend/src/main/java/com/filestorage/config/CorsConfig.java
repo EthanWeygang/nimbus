@@ -14,10 +14,20 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*")); // Use patterns instead of origins
-        configuration.addAllowedMethod("*"); // Allows all methods
-        configuration.setAllowedHeaders(List.of("*")); // Allows all headers
-        configuration.setAllowCredentials(false); // Disable credentials for wildcard origins
+        
+        configuration.setAllowedOrigins(List.of("https://dx26d5982gukc.cloudfront.net"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of(
+            "Authorization", 
+            "Content-Type", 
+            "X-Requested-With",
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // Use this configuration for all endpoints
