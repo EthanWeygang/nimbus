@@ -15,7 +15,10 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/login", {
+      // const response = await fetch(`https://dcg0tgtvg8elj.cloudfront.net/api/login?cb=${Date.now()}`, { // CloudFront endpoint
+      const apiUrl = `${process.env.REACT_APP_API_URL}/api/login`;
+      console.log("Attempting to fetch from:", apiUrl); // Debug log
+      const response = await fetch(apiUrl, { // Use environment variable
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({email: email, password: password})

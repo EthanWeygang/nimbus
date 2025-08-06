@@ -53,7 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         // Skip JWT processing for public endpoints
         if (requestURI.equals("/api/login") || 
             requestURI.equals("/api/signup") || 
-            requestURI.equals("/api/verify")) {
+            requestURI.equals("/api/verify") ||
+            requestURI.equals("/api/resend-verification")) {
             logger.info("Skipping JWT filter for public endpoint: {}", requestURI);
             filterChain.doFilter(request, response);
             return;

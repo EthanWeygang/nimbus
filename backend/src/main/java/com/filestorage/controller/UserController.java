@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.filestorage.User;
@@ -16,6 +17,8 @@ import com.filestorage.dto.RegisterUserDto;
 import com.filestorage.dto.VerifyUserDto;
 import com.filestorage.service.AuthenticationService;
 import com.filestorage.service.JwtService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -35,9 +38,24 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @RequestMapping(value = "/login", method = RequestMethod.OPTIONS)
+    public ResponseEntity<?> loginOptions() {
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<?> logIn(@RequestBody Map<String, String> request){
+    @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS}) // AI
+    public ResponseEntity<?> logIn(@RequestBody Map<String, String> request, HttpServletRequest httpRequest){
         try {
+            // Log request details for debugging
+            System.out.println("=== LOGIN REQUEST DEBUG ===");
+            System.out.println("Request URI: " + httpRequest.getRequestURI());
+            System.out.println("Request Method: " + httpRequest.getMethod());
+            System.out.println("Remote Address: " + httpRequest.getRemoteAddr());
+            System.out.println("X-Forwarded-For: " + httpRequest.getHeader("X-Forwarded-For"));
+            System.out.println("X-Real-IP: " + httpRequest.getHeader("X-Real-IP"));
+            System.out.println("Host: " + httpRequest.getHeader("Host"));
+            System.out.println("User-Agent: " + httpRequest.getHeader("User-Agent"));
         
             String email = request.get("email");
             String password = request.get("password");

@@ -24,7 +24,7 @@ function useJwt() {
 
         try {
             // Test the token by making a request to a protected endpoint
-            const response = await fetch("/api/auth", {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,

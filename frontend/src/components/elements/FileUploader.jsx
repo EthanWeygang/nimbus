@@ -49,7 +49,7 @@ function FileUploader(){
         console.log("Making request to backend...");
 
         // Try direct backend connection to bypass proxy issues
-        fetch("http://localhost:8080/api/upload", {
+        fetch(`${process.env.REACT_APP_API_URL}/api/upload`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`

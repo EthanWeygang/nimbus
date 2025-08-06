@@ -12,26 +12,41 @@
       setLoading(true)
       
       try{
-         const response = await fetch("/api/verify", {
-         method: "POST",
-         headers: { "Content-Type": "application/json" },
-         body: JSON.stringify({ verificationCode: verificationCode })
-         })
+         console.log("Sending verification request to:", `${process.env.REACT_APP_API_URL}/api/verify`);
+         console.log("Verification code:", verificationCode);
+         
+         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ verificationCode: verificationCode })
+         });
+
+         console.log("Response status:", response.status);
+         console.log("Response ok:", response.ok);
+
+         if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+         }
 
          const data = await response.json();
+         console.log("Response data:", data);
 
          if(data.error){
             alert(data.error)
+            setLoading(false)
+            return
          }
 
          if(data.response){
             alert(data.response)
             setLoading(false)
             navigate("/login")
+            return
          }
 
       }catch(e){
-         alert(e)
+         console.error("Verification error:", e);
+         alert(`Verification failed: ${e.message}`)
       }
 
       setLoading(false)

@@ -14,10 +14,10 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("ihaventthoughtofawebsitenameyet.com", "http://localhost:3000")); // Only allows requests from here
-        configuration.addAllowedMethod("*"); // Allows all methods, headers and allows cookies/credentials to be sent
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(List.of("*")); // Use patterns instead of origins
+        configuration.addAllowedMethod("*"); // Allows all methods
+        configuration.setAllowedHeaders(List.of("*")); // Allows all headers
+        configuration.setAllowCredentials(false); // Disable credentials for wildcard origins
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // Use this configuration for all endpoints

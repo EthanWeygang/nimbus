@@ -25,7 +25,7 @@ function Signup() {
     
     setIsLoading(true);
 
-    fetch("/api/signup",{
+    fetch(`${process.env.REACT_APP_API_URL}/api/signup`,{
           method: "POST",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({email, password})

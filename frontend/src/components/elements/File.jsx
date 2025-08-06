@@ -11,7 +11,7 @@ function File({ filename, loadFiles }) {
   async function downloadFile(){
     setIsDownloading(true);
     try{
-      const response = await fetch(`/api/download?fileName=${encodeURIComponent(filename)}`,
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/download?fileName=${encodeURIComponent(filename)}`,
         {
           method: "GET",
           headers: 
@@ -48,7 +48,7 @@ function File({ filename, loadFiles }) {
     
     setIsDeleting(true);
     try{
-      const response = await fetch("/api/files",
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/files`,
         {
           method: "DELETE",
           headers: 
